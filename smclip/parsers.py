@@ -6,8 +6,23 @@ import re
 import argparse
 
 
-class Argparser(argparse.ArgumentParser):
-    """Custom Argparser with support for printing subcommands in help"""
+class ArgparserSub(argparse.ArgumentParser):
+    """Argparser with support for support for printing subcommands in help.
+
+    Subcommands should be defined as remainder argument (defined by
+    ArgparseSub.REMAINING_ARGS).
+    """
+
+    REMAINING_ARGS = '_subcommand'
+
+    def __init__(self, subcommands=None, subcmds_help_title=None, **kwargs):
+        if subcommands is None:
+            subcommands = {}
+        self._subcommands = subcommands
+        self._subcmds_help_title = subcmds_help_title or 'subcommands'
+
+        kwargs.setdefault('formatter_class', GroupHelpFormatter)
+        super(ArgparserSub, self).__init__(**kwargs)
 
     def format_help(self):
 
@@ -35,63 +50,10 @@ class Argparser(argparse.ArgumentParser):
         return formatter.format_help()
 
     def format_custom_sections(self, formatter):
-        """Format custom sections between arguments and epilog
-
-        Args:
-            formatter: help formatter
-        """
-        pass
-
-
-class ArgparseSub(Argparser):
-    """Argparser with support for subcommands as remainder
-    of unknown arguments
-
-    Remainder after parsing is saved into a namespace attribute
-    called '_subcommand' (defined in ArgparseSub.REMAINING_ARGS)
-    """
-
-    REMAINING_ARGS = '_subcommand'
-
-    def __init__(self, subcommands=None, subcmds_help_title=None, **kwargs):
-        if subcommands is None:
-            subcommands = {}
-        self._subcommands = subcommands
-        self._subcmds_help_title = subcmds_help_title or 'subcommands'
-
-        kwargs.setdefault('formatter_class', GroupHelpFormatter)
-        super(ArgparseSub, self).__init__(**kwargs)
-
-    def format_custom_sections(self, formatter):
         # Subcommands section
         formatter.start_section(self._subcmds_help_title)
         formatter.add_subcommands(self._subcommands)
         formatter.end_section()
-
-
-def split_docstring(string):
-    """Split docstring to header and description
-
-    Separator between header and description is one blank line.
-    When no separator is found, then description is None.
-
-    Args:
-        string (str): docstring
-
-    Returns:
-        header, description
-    """
-
-    if not string:
-        return None, None
-
-    parts = re.split(r'(?:\n|\r|\r\n)[ \t]*(?:\n|\r|\r\n)', string, 1)
-    if len(parts) == 1:
-        # header is considered also as description
-        title = parts[0]
-        return title, None
-
-    return parts[0], parts[1]
 
 
 class GroupHelpFormatter(argparse.HelpFormatter):
@@ -154,3 +116,28 @@ class GroupHelpFormatter(argparse.HelpFormatter):
         for subcmd_name in subcommands:
             subcmd = subcommands[subcmd_name]
             self.add_subcommand(subcmd_name, subcmd)
+
+
+def split_docstring(string):
+    """Split docstring to header and description
+
+    Separator between header and description is one blank line.
+    When no separator is found, then description is None.
+
+    Args:
+        string (str): docstring
+
+    Returns:
+        header, description
+    """
+
+    if not string:
+        return None, None
+
+    parts = re.split(r'(?:\n|\r|\r\n)[ \t]*(?:\n|\r|\r\n)', string, 1)
+    if len(parts) == 1:
+        # header is considered also as description
+        title = parts[0]
+        return title, None
+
+    return parts[0], parts[1]

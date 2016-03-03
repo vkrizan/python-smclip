@@ -5,7 +5,7 @@
 import argparse
 
 from .exceptions import CommandNotFound
-from .parsers import Argparser, ArgparseSub, split_docstring
+from .parsers import ArgparserSub, split_docstring
 
 __all__ = ['Command', 'CommandGroup', 'ChainedCommand', 'ChainedCommandGroup',
            'ChainedOutputResults']
@@ -60,7 +60,7 @@ class Command(object):
         self.description = description
 
         if not parser_cls:
-            parser_cls = Argparser
+            parser_cls = argparse.ArgumentParser
 
         self.parser_cls = parser_cls
 
@@ -165,7 +165,7 @@ class Command(object):
 
     def _extract_parsed_args(self, namespace):
         args = vars(namespace)
-        remaining = args.pop(ArgparseSub.REMAINING_ARGS, None)
+        remaining = args.pop(ArgparserSub.REMAINING_ARGS, None)
         return args, remaining
 
     def preprocess(self, **args):
@@ -246,7 +246,7 @@ class CommandGroup(Command):
     """
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('parser_cls', ArgparseSub)
+        kwargs.setdefault('parser_cls', ArgparserSub)
         super(CommandGroup, self).__init__(*args, **kwargs)
         self.subcmds_cls = {}
         self.subcmd_aliases = {}
@@ -303,7 +303,7 @@ class CommandGroup(Command):
 
     def create_parser(self):
         parser = super(CommandGroup, self).create_parser()
-        parser.add_argument(ArgparseSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
+        parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
     def invoke(self, raw_args):
@@ -383,7 +383,7 @@ class ChainedCommand(Command):
 
     def create_parser(self):
         parser = super(ChainedCommand, self).create_parser()
-        parser.add_argument(ArgparseSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
+        parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
 
