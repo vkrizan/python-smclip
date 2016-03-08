@@ -358,6 +358,7 @@ class CommandGroup(Command):
 
         subcmd = self.new_subcommand(subcmd_cls, real_name)
         subcmd.parent = self
+        self.invoked_subcommand = subcmd
 
         return subcmd.invoke(raw_args)
 
