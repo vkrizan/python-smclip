@@ -288,7 +288,7 @@ class CommandGroup(Command):
             if alias in self.subcmd_aliases:
                 raise RuntimeError('Alias with name {} is already registered!'.format(name))
 
-            self.subcmd_aliases[name] = command_cls
+            self.subcmd_aliases[alias] = command_cls
 
         if is_fallback:
             self._fallback_subcmd_cls = command_cls
@@ -312,7 +312,6 @@ class CommandGroup(Command):
 
         if unknown_args:
             if self._default_subcmd_cls:
-                self.preprocess(**parsed_args)
                 rv = self.invoke_default(raw_args)
                 return rv
 

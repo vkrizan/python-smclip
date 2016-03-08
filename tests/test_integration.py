@@ -61,10 +61,10 @@ class TestSimpleCommand:
         ('help --helpopt value', None, 'value'),
         ('--appopt A help', 'A', None),
         ('--appopt A help --helpopt value', 'A', 'value'),
-        pytest.mark.xfail(('docs', None, None)),
-        pytest.mark.xfail(('docs --helpopt value', None, 'value')),
-        pytest.mark.xfail(('--appopt A docs', 'A', None)),
-        pytest.mark.xfail(('--appopt A docs --helpopt value', 'A', 'value')),
+        ('docs', None, None),
+        ('docs --helpopt value', None, 'value'),
+        ('--appopt A docs', 'A', None),
+        ('--appopt A docs --helpopt value', 'A', 'value'),
     ])
     def test_correct(self, myapp, cmdargs, x_app_opt, x_sub_opt):
 
@@ -102,9 +102,9 @@ class TestCommandGroup:
 
     @pytest.mark.parametrize('cmdargs,x_app_opt,x_sub_opt', [
         ('listdefault', None, None),
-        pytest.mark.xfail(('listdefault --listopt value', None, 'value')),
+        ('listdefault --listopt value', None, 'value'),
         ('--appopt A listdefault', 'A', None),
-        pytest.mark.xfail(('--appopt A listdefault --listopt value', 'A', 'value')),
+        ('--appopt A listdefault --listopt value', 'A', 'value'),
     ])
     def test_group_default_invoke(self, myapp, cmdargs, x_app_opt, x_sub_opt):
 
@@ -140,19 +140,19 @@ class TestCommandGroup:
         ('--appopt A group --groupopt G create --createopt S',
             'A', 'G', 'S'),
         # Aliased group command
-        pytest.mark.xfail(('task create',
-            None, None, None)),
-        pytest.mark.xfail(('task create --createopt S',
-            None, None, 'S')),
-        pytest.mark.xfail(('task --groupopt G create --createopt S',
-            None, 'G', 'S')),
+        ('task create',
+            None, None, None),
+        ('task create --createopt S',
+            None, None, 'S'),
+        ('task --groupopt G create --createopt S',
+            None, 'G', 'S'),
         # Aliased create subcommand
-        pytest.mark.xfail(('group new',
-            None, None, None)),
-        pytest.mark.xfail(('group new --createopt S',
-            None, None, 'S')),
-        pytest.mark.xfail(('group --groupopt G new --createopt S',
-            None, 'G', 'S')),
+        ('group new',
+            None, None, None),
+        ('group new --createopt S',
+            None, None, 'S'),
+        ('group --groupopt G new --createopt S',
+            None, 'G', 'S'),
         # same subcommands but on group with default command
         ('listdefault create',
             None, None, None),
