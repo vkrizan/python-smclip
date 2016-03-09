@@ -1,11 +1,6 @@
 
 import pytest
 
-# try:
-#     import mock
-# except ImportError:
-#     import unittest.mock as mock
-
 from integration_classes import *
 
 
@@ -182,6 +177,25 @@ class TestCommandGroup:
         subcmd.preprocess.assert_called_once_with(createopt=x_sub_opt)
         subcmd.this_action.assert_called_once_with(createopt=x_sub_opt)
 
+    @pytest.mark.parametrize('cmdargs,real_names_only,expected', [
+        ('group', False, ['myapp']),
+        ('group', True, ['myapp']),
+        ('group new', False, ['group', 'myapp']),
+        ('group new', True, ['group', 'myapp']),
+        ('task new', False, ['task', 'myapp']),
+        ('task new', True, ['group', 'myapp']),
+    ])
+    def test_last_cmd_get_parent_names(self, myapp, cmdargs, real_names_only, expected):
+
+        myapp.invoke(_split_cmd_args(cmdargs))
+
+        lastcmd = myapp.invoked_subcommand
+        while hasattr(lastcmd, 'invoked_subcommand') and lastcmd.invoked_subcommand:
+            lastcmd = lastcmd.invoked_subcommand
+
+        parent_names = lastcmd.get_parent_names(real_names_only=real_names_only)
+        assert parent_names == expected
+
 
 class TestChainedCommands:
 
@@ -258,3 +272,11 @@ class TestChainedCommands:
         assert len(chainedgrp.results_callback.call_args[0]) == 1
         result_obj = chainedgrp.results_callback.call_args[0][0]
         assert result_obj.results == expected_rvs.results
+        assert iter(result_obj)
+
+    def test_unknown_command(self, myapp):
+
+        with pytest.raises(smclip.CommandNotFound) as excinfo:
+            myapp.invoke(_split_cmd_args('empty unknowncmd'))
+
+        assert excinfo.value.command_name == 'unknowncmd'

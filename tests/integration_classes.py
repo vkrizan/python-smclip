@@ -10,20 +10,23 @@ except ImportError:
 class MyApplication(smclip.CommandGroup):
 
     def __init__(self):
-        super(MyApplication, self).__init__(app=self)
+        parent = super(MyApplication, self)
+        parent.__init__(app=self)
 
         self.name = 'myapp'
 
         self.register(SimpleCommand)
         self.register(ItemGroupCommand)
         self.register(ItemGroupCommandDefault)
+        self.register(EmptyChainedGroup)
 
         # Mock methods
-        self.preprocess = mock.Mock()
-        self.this_action = mock.Mock()
-        self.results_callback = mock.Mock()
+        self.preprocess = mock.Mock(wraps=parent.preprocess)
+        self.this_action = mock.Mock(wraps=parent.this_action)
+        self.results_callback = mock.Mock(wraps=parent.results_callback)
 
     def add_arguments(self, parser):
+        super(MyApplication, self).add_arguments(parser)  # noop
         parser.add_argument('--appopt')
 
 
@@ -181,3 +184,8 @@ class ItemMove(smclip.ChainedCommand):
     def add_arguments(self, parser):
         parser.add_argument('--moveopt')
         parser.add_argument('where')
+
+
+class EmptyChainedGroup(smclip.ChainedCommandGroup):
+
+    default_name = 'empty'
