@@ -46,14 +46,6 @@ class SimpleCommand(smclip.Command):
     def add_arguments(self, parser):
         parser.add_argument('--helpopt')
 
-    # def preprocess(self, **args):
-    #     # Test to be called
-    #     raise AssertionError('Not tested/mocked')
-    #
-    # def this_action(self, **args):
-    #     # Test to be called
-    #     raise AssertionError('Not tested/mocked')
-
 
 class ItemGroupCommand(smclip.CommandGroup):
     """Print help"""
@@ -111,7 +103,6 @@ class ListCommand(smclip.Command):
 
     def add_arguments(self, parser):
         parser.add_argument('--listopt')
-        #parser.add_argument('poslist')
 
 
 class CreateCommand(smclip.Command):
