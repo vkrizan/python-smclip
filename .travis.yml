@@ -11,11 +11,11 @@ before_install:
 
 install:
   - pip install --editable .
-  - pip install --upgrade pytest mock
+  - pip install --upgrade pytest mock pytest-cov
 
 script:
   - cd tests
-  - py.test --verbose
+  - py.test --verbose --cov=smclip
 
 after_success:
   - codecov
