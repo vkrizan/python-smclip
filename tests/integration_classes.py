@@ -2,9 +2,9 @@
 import smclip
 
 try:
-    import mock
-except ImportError:
     import unittest.mock as mock
+except ImportError:
+    import mock
 
 
 class MyApplication(smclip.CommandGroup):
