@@ -42,7 +42,7 @@ setup(
     ],
 
     packages=['smclip'],
-    tests_require=['pytest', 'mock']
+    tests_require=['pytest', 'mock', 'pytest-cov']
 )
 
 
