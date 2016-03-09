@@ -25,7 +25,7 @@ def test_error_same_default_name_register():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'already registered' in excinfo.value.message
+    assert 'already registered' in str(excinfo.value)
 
 
 def test_error_same_name_register():
@@ -47,7 +47,7 @@ def test_error_same_name_register():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'already registered' in excinfo.value.message
+    assert 'already registered' in str(excinfo.value)
 
 
 def test_error_no_default_name():
@@ -65,7 +65,7 @@ def test_error_no_default_name():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'No name' in excinfo.value.message
+    assert 'No name' in str(excinfo.value)
 
 
 def test_error_same_default_alias_register():
@@ -85,7 +85,7 @@ def test_error_same_default_alias_register():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'already registered' in excinfo.value.message
+    assert 'already registered' in str(excinfo.value)
 
 
 def test_error_same_alias_register():
@@ -108,7 +108,7 @@ def test_error_same_alias_register():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'already registered' in excinfo.value.message
+    assert 'already registered' in str(excinfo.value)
 
 
 def test_error_same_alias_as_name_register():
@@ -131,4 +131,4 @@ def test_error_same_alias_as_name_register():
     with pytest.raises(RuntimeError) as excinfo:
         CommandGroup()
 
-    assert 'already registered' in excinfo.value.message
+    assert 'already registered' in str(excinfo.value)
