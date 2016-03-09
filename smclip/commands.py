@@ -114,26 +114,6 @@ class Command(object):
             parent = parent.parent
         return parent_names
 
-    def get_parent(self, cls=None, name=None):
-        parent = self.parent
-        while parent:
-            parent_name = parent.name
-            if name is not None:
-                if cls:
-                    if parent_name == name and parent.__class__ is cls:
-                        return parent
-                else:
-                    if parent_name == name:
-                        return parent
-            else:
-                if cls:
-                    if parent.__class__ is cls:
-                        return parent
-                else:
-                    return parent
-
-            parent = parent.parent
-
     def add_arguments(self, parser):
         """Abstract function for adding arguments to parser invoked
         right after parser is created.
