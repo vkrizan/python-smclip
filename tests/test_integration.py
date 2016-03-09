@@ -66,7 +66,7 @@ class TestSimpleCommand:
         myapp.invoke(_split_cmd_args(cmdargs))
 
         myapp.preprocess.assert_called_once_with(appopt=x_app_opt)
-        myapp.this_action.assert_not_called()
+        assert myapp.this_action.call_count == 0
 
         assert isinstance(myapp.invoked_subcommand, SimpleCommand)
         helpcmd = myapp.invoked_subcommand
@@ -87,7 +87,7 @@ class TestCommandGroup:
         myapp.invoke(_split_cmd_args(cmdargs))
 
         myapp.preprocess.assert_called_once_with(appopt=x_app_opt)
-        myapp.this_action.assert_not_called()
+        assert myapp.this_action.call_count == 0
 
         groupcmd = myapp.invoked_subcommand
         assert isinstance(groupcmd, ItemGroupCommand)
@@ -106,14 +106,14 @@ class TestCommandGroup:
         myapp.invoke(_split_cmd_args(cmdargs))
 
         myapp.preprocess.assert_called_once_with(appopt=x_app_opt)
-        myapp.this_action.assert_not_called()
+        assert myapp.this_action.call_count == 0
 
         groupcmd = myapp.invoked_subcommand
         assert isinstance(groupcmd, ItemGroupCommandDefault)
         # Item group of chained commands with default command does not call its callbacks
         # when invoking default command
-        groupcmd.preprocess.assert_not_called()
-        groupcmd.this_action.assert_not_called()
+        assert groupcmd.preprocess.call_count == 0
+        assert groupcmd.this_action.call_count == 0
 
         defaultgrpcmd = groupcmd.invoked_subcommand
         assert isinstance(defaultgrpcmd, ListCommand)
@@ -166,11 +166,11 @@ class TestCommandGroup:
 
         myapp.invoke(_split_cmd_args(cmdargs))
         myapp.preprocess.assert_called_once_with(appopt=x_app_opt)
-        myapp.this_action.assert_not_called()
+        assert myapp.this_action.call_count == 0
 
         groupcmd = myapp.invoked_subcommand
         groupcmd.preprocess.assert_called_once_with(groupopt=x_grp_opt)
-        groupcmd.this_action.assert_not_called()
+        assert groupcmd.this_action.call_count == 0
 
         subcmd = groupcmd.invoked_subcommand
         assert isinstance(subcmd, CreateCommand)
@@ -201,11 +201,11 @@ class TestChainedCommands:
 
     def _common_group_assertions(self, myapp):
         myapp.preprocess.assert_called_once_with(appopt=None)
-        myapp.this_action.assert_not_called()
+        assert myapp.this_action.call_count == 0
 
         groupcmd = myapp.invoked_subcommand
         groupcmd.preprocess.assert_called_once_with(groupopt=None)
-        groupcmd.this_action.assert_not_called()
+        assert groupcmd.this_action.call_count == 0
 
     @pytest.mark.parametrize('cmdargs,x_cmd_alias,x_cgrp_opt', [
         ('group ID', 'ID', None),
@@ -225,7 +225,7 @@ class TestChainedCommands:
         assert not chainedgrp.invoked_subcommand
         chainedgrp.preprocess.assert_called_once_with(vieweditopt=x_cgrp_opt)
         chainedgrp.this_action.assert_called_once_with(vieweditopt=x_cgrp_opt)
-        chainedgrp.results_callback.assert_not_called()
+        assert chainedgrp.results_callback.call_count == 0
 
     @pytest.mark.parametrize('cmdargs,x_cgrp_opt,x_results', [
         ('group 1234 change move here', None,
@@ -257,7 +257,7 @@ class TestChainedCommands:
         assert chainedgrp.invoked_subcommand is True
         assert len(chainedgrp.invoked_subcommands) == len(x_results)
         chainedgrp.preprocess.assert_called_once_with(vieweditopt=x_cgrp_opt)
-        chainedgrp.this_action.assert_not_called()
+        assert chainedgrp.this_action.call_count == 0
 
         expected_rvs = smclip.ChainedOutputResults()
 
