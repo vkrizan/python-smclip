@@ -60,12 +60,11 @@ Cement
 
 http://builtoncement.com/
 
-Cement is a framework intended for complex CLI applications that comes
-with multiple set of utilities (logging, caching).  Command line
-parsing is one a part of Cement framework.  Cement support nested
-sub-commands by nesting controllers.  Default and fallback commands
-and conditional callback triggering is done by extending core
-controllers.
+Cement is a framework intended for complex CLI applications. Cement
+comes with multiple set of utilities (logging, caching).  Command line
+parsing is a one part of Cement framework.  Cement support sub-commands
+by nesting controllers.  Default and fallback commands and conditional
+callback triggering is done by extending core controllers.
 
 
 Argument Examples
