@@ -41,7 +41,7 @@ class Command(object):
         app (object): application object
         title (str): header of current class docstring
         description (str): body of current class docstring
-        parser_cls (object): argument parser's class (default: Argparser)
+        parser_cls (object): argument parser's class (default: ArgumentParser)
         parser (object): lazy loaded parser instance
     """
 
