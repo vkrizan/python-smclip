@@ -11,4 +11,6 @@ class CommandNotFound(Exception):
         super(CommandNotFound, self).__init__()
         self.command_name = command_name
         self.parent = parent
-        self.message = "Unknown command `{}'".format(command_name)
+
+    def __str__(self):
+        return "Unknown command `{}'".format(self.command_name)
