@@ -139,11 +139,11 @@ class Command(object):
         """Invoke preprocess and this_action callback and
         return value from this_action callback"""
 
-        preprocessed_args = self.preprocess(**parsed_args)
+        preprocessed_args = self.preprocess(**dict(parsed_args))
         if isinstance(preprocessed_args, dict):
-            action_args = preprocessed_args
+            action_args = dict(preprocessed_args)
         elif preprocessed_args is None:
-            action_args = parsed_args
+            action_args = dict(parsed_args)
         else:
             raise AssertionError('Expected preprocess to return dict or None, {} returned instead!'
                                  .format(type(preprocessed_args)))
@@ -327,7 +327,7 @@ class CommandGroup(Command):
             self.invoked_subcommand = subcmd
             subcmd.parent = self
 
-            self.preprocess(**parsed_args)
+            self.preprocess(**dict(parsed_args))
 
             # Subcommand invoke
             rv = subcmd.invoke(sub_args)
@@ -438,7 +438,7 @@ class ChainedCommandGroup(CommandGroup):
                 self.invoked_subcommands.append(subcmd)
                 subcmd.parent = self
 
-            self.preprocess(**parsed_args)
+            self.preprocess(**dict(parsed_args))
             results = ChainedOutputResults()
 
             for subcmd, sub_args in chained_cmd_args:
