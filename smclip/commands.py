@@ -133,14 +133,22 @@ class Command(object):
         namespace = self.parser.parse_args(raw_args)
         parsed_args, _ = self._extract_parsed_args(namespace)
 
-        return self.invoke_callbacks(**parsed_args)
+        return self.invoke_callbacks(parsed_args)
 
-    def invoke_callbacks(self, **parsed_args):
+    def invoke_callbacks(self, parsed_args):
         """Invoke preprocess and this_action callback and
         return value from this_action callback"""
 
-        self.preprocess(**parsed_args)
-        rv = self.this_action(**parsed_args)
+        preprocessed_args = self.preprocess(**parsed_args)
+        if isinstance(preprocessed_args, dict):
+            action_args = preprocessed_args
+        elif preprocessed_args is None:
+            action_args = parsed_args
+        else:
+            raise AssertionError('Expected preprocess to return dict or None, {} returned instead!'
+                                 .format(type(preprocessed_args)))
+
+        rv = self.this_action(**action_args)
         return rv
 
     def _extract_parsed_args(self, namespace):
@@ -153,6 +161,9 @@ class Command(object):
 
         This callback is only called when there is no error
         from argument parsing.
+        Preprocess callback may return a dictionary of new
+        arguments that will be passed to ``this_action``
+        callback.
 
         Args:
             **args: parsed arguments
@@ -166,7 +177,7 @@ class Command(object):
         from argument parsing.
 
         Args:
-            **args: parsed arguments
+            **args: parsed or preprocessed arguments
         """
 
         pass
@@ -327,7 +338,7 @@ class CommandGroup(Command):
             if self._default_subcmd_cls:
                 rv = self.invoke_default(raw_args)
             else:
-                rv = self.invoke_callbacks(**parsed_args)
+                rv = self.invoke_callbacks(parsed_args)
 
         return rv
 
@@ -432,7 +443,7 @@ class ChainedCommandGroup(CommandGroup):
 
             for subcmd, sub_args in chained_cmd_args:
                 # Our Chained command invocation
-                subrv = subcmd.invoke_callbacks(**sub_args)
+                subrv = subcmd.invoke_callbacks(sub_args)
                 results.add_result(subcmd, subrv)
 
             rv = results
@@ -440,10 +451,8 @@ class ChainedCommandGroup(CommandGroup):
 
         else:
 
-            self.preprocess(**parsed_args)
-
             # Callback
-            rv = self.this_action(**parsed_args)
+            rv = self.invoke_callbacks(parsed_args)
 
         return rv
 

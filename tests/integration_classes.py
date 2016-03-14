@@ -19,6 +19,8 @@ class MyApplication(smclip.CommandGroup):
         self.register(ItemGroupCommand)
         self.register(ItemGroupCommandDefault)
         self.register(EmptyChainedGroup)
+        self.register(PreprocessingCommand)
+        self.register(BadPreprocessingCommand)
 
         # Mock methods
         self.preprocess = mock.Mock(wraps=parent.preprocess)
@@ -40,12 +42,39 @@ class SimpleCommand(smclip.Command):
         super(SimpleCommand, self).__init__(*args, **kwargs)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
 
     def add_arguments(self, parser):
         parser.add_argument('--helpopt')
 
+
+class BadPreprocessingCommand(smclip.Command):
+    """Print help"""
+
+    default_name = 'badoverride'
+
+    def __init__(self, *args, **kwargs):
+        super(BadPreprocessingCommand, self).__init__(*args, **kwargs)
+
+        # Mock methods
+        self.preprocess = mock.Mock(return_value=False)
+
+
+class PreprocessingCommand(smclip.Command):
+    """Print help"""
+
+    default_name = 'override'
+
+    def __init__(self, *args, **kwargs):
+        super(PreprocessingCommand, self).__init__(*args, **kwargs)
+
+        # Mock methods
+        self.preprocess = mock.Mock(return_value=dict(replaced='othervalue'))
+        self.this_action = mock.Mock()
+
+    def add_arguments(self, parser):
+        parser.add_argument('--toreplace')
 
 class ItemGroupCommand(smclip.CommandGroup):
     """Print help"""
@@ -61,7 +90,7 @@ class ItemGroupCommand(smclip.CommandGroup):
         self.register(ViewEditCommand, is_fallback=True)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
         self.results_callback = mock.Mock()
 
@@ -82,7 +111,7 @@ class ItemGroupCommandDefault(smclip.CommandGroup):
         self.register(ViewEditCommand, is_fallback=True)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
 
     def add_arguments(self, parser):
@@ -98,7 +127,7 @@ class ListCommand(smclip.Command):
         super(ListCommand, self).__init__(*args, **kwargs)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
 
     def add_arguments(self, parser):
@@ -114,7 +143,7 @@ class CreateCommand(smclip.Command):
         super(CreateCommand, self).__init__(*args, **kwargs)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
 
     def add_arguments(self, parser):
@@ -132,7 +161,7 @@ class ViewEditCommand(smclip.ChainedCommandGroup):
         self.register(ItemMove)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock()
         self.results_callback = mock.Mock(wraps=self._results_callback)
 
@@ -153,7 +182,7 @@ class ItemChange(smclip.ChainedCommand):
         super(ItemChange, self).__init__(*args, **kwargs)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock(return_value='rv-from-change')
 
     def add_arguments(self, parser):
@@ -169,7 +198,7 @@ class ItemMove(smclip.ChainedCommand):
         super(ItemMove, self).__init__(*args, **kwargs)
 
         # Mock methods
-        self.preprocess = mock.Mock()
+        self.preprocess = mock.Mock(return_value=None)
         self.this_action = mock.Mock(return_value='rv-from-move')
 
     def add_arguments(self, parser):

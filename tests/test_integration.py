@@ -74,6 +74,23 @@ class TestSimpleCommand:
         helpcmd.this_action.assert_called_once_with(helpopt=x_sub_opt)
 
 
+class TestPreprocessArgsOverride:
+
+    def test_correct(self, myapp):
+
+        myapp.invoke(_split_cmd_args('override --toreplace value'))
+
+        overridecmd = myapp.invoked_subcommand
+        overridecmd.preprocess.assert_called_once_with(toreplace='value')
+        overridecmd.this_action.assert_called_once_with(replaced='othervalue')
+
+    def test_incorrect(self, myapp):
+        with pytest.raises(AssertionError) as excinfo:
+            myapp.invoke(_split_cmd_args('badoverride'))
+
+        assert 'Expected preprocess' in str(excinfo.value)
+
+
 class TestCommandGroup:
 
     @pytest.mark.parametrize('cmdargs,x_app_opt,x_grp_opt', [
