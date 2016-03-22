@@ -1,22 +1,44 @@
 import argparse
 import pytest
+import smclip
 from smclip.parsers import ArgparserSub, split_docstring
 
 
-def test_ArgparseSub():
+class TestArgparseSub():
 
-    parser = ArgparserSub()
-    parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
-    parser.add_argument('--arg', nargs=1)
+    def _create_parser(self, **opts):
+        parserobj = ArgparserSub(**opts)
+        parserobj.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
+        parserobj.add_argument('--arg', nargs=1)
+        return parserobj
 
-    args = '--arg value subcommand --subarg'.split(' ')
+    def test_arg_parsing(self):
+        parser = self._create_parser()
+        args = '--arg value subcommand --subarg'.split(' ')
 
-    namespace, leftover = parser.parse_known_args(args)
-    args_dict = vars(namespace)
-    assert len(args_dict) == 2
-    assert not leftover
-    assert args_dict['arg'] == ['value']
-    assert args_dict[ArgparserSub.REMAINING_ARGS] == ['subcommand', '--subarg']
+        namespace, leftover = parser.parse_known_args(args)
+        args_dict = vars(namespace)
+        assert len(args_dict) == 2
+        assert not leftover
+        assert args_dict['arg'] == ['value']
+        assert args_dict[ArgparserSub.REMAINING_ARGS] == ['subcommand', '--subarg']
+
+    def test_formatted_help(self):
+
+        class MySubcommand(smclip.Command):
+            """Subcommand help"""
+            default_name = 'subcmd_name'
+
+        subcommands = {MySubcommand.default_name: MySubcommand()}
+
+        parser = self._create_parser(subcommands=subcommands)
+
+        formatted_help = parser.format_help()
+        print(formatted_help)
+        assert formatted_help
+        assert 'subcommands:' in formatted_help
+        assert 'subcmd_name' in formatted_help, 'Subcommand not found in help'
+        assert 'Subcommand help' in formatted_help, "Subcommand's help not found in common help"
 
 
 @pytest.mark.parametrize('docstring', (

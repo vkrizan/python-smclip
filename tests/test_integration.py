@@ -47,6 +47,7 @@ class TestApplication:
             myapp.invoke(_split_cmd_args('unknowncmd'))
 
         assert excinfo.value.command_name == 'unknowncmd'
+        assert 'unknowncmd' in str(excinfo.value)
 
 
 class TestSimpleCommand:

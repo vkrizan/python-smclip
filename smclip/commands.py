@@ -289,6 +289,8 @@ class CommandGroup(Command):
 
     def get_parser_options(self):
         opts = super(CommandGroup, self).get_parser_options()
+
+        # pass subcommands to parser for showing help
         opts['subcommands'] = self.subcmds_cls
         return opts
 
