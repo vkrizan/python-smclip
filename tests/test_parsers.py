@@ -1,5 +1,6 @@
 import argparse
-from smclip.parsers import ArgparserSub
+import pytest
+from smclip.parsers import ArgparserSub, split_docstring
 
 
 def test_ArgparseSub():
@@ -16,3 +17,38 @@ def test_ArgparseSub():
     assert not leftover
     assert args_dict['arg'] == ['value']
     assert args_dict[ArgparserSub.REMAINING_ARGS] == ['subcommand', '--subarg']
+
+
+@pytest.mark.parametrize('docstring', (
+        """Title""",
+        # ==
+        """ Title """,
+        # ==
+        """
+        Title""",
+))
+def test_split_docstring_title_only(docstring):
+    title, description = split_docstring(docstring)
+    assert title == 'Title'
+    assert not description
+
+@pytest.mark.parametrize('docstring', (
+        """Title
+
+        Some Description""",
+        # ==
+        """ Title
+
+        Some Description
+        """,
+        # ==
+        """
+        Title
+
+        Some Description
+        """,
+))
+def test_split_docstring_description(docstring):
+    title, description = split_docstring(docstring)
+    assert title == 'Title'
+    assert description == 'Some Description'

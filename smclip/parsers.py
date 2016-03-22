@@ -128,7 +128,7 @@ def split_docstring(string):
         string (str): docstring
 
     Returns:
-        header, description
+        title, description
     """
 
     if not string:
@@ -137,7 +137,9 @@ def split_docstring(string):
     parts = re.split(r'(?:\n|\r|\r\n)[ \t]*(?:\n|\r|\r\n)', string, 1)
     if len(parts) == 1:
         # header is considered also as description
-        title = parts[0]
+        title = str(parts[0]).strip()
         return title, None
 
-    return parts[0], parts[1]
+    title = str(parts[0]).strip()
+    description = str(parts[1]).strip()
+    return title, description
