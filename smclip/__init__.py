@@ -4,7 +4,7 @@
 
 """Simple Multi Command Line Parser"""
 
-__version__ = '0.2.dev1'
+__version__ = '0.2'
 
 from .commands import *
 from .exceptions import *
