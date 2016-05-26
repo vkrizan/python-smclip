@@ -434,11 +434,13 @@ class ChainedCommandGroup(CommandGroup):
                 real_name = self.get_subcmd_real_name(subcmd_cls)
                 subcmd = self.new_subcommand(subcmd_cls, real_name, subcmd_name)
 
+                # set references
+                self.invoked_subcommands.append(subcmd)
+                subcmd.parent = self
+
                 sub_namespace = subcmd.parser.parse_args(remaining)
                 sub_args, remaining = self._extract_parsed_args(sub_namespace)
                 chained_cmd_args.append((subcmd, sub_args))
-                self.invoked_subcommands.append(subcmd)
-                subcmd.parent = self
 
             self.preprocess(**dict(parsed_args))
             results = ChainedOutputResults()

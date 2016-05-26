@@ -292,6 +292,16 @@ class TestChainedCommands:
         assert result_obj.results == expected_rvs.results
         assert iter(result_obj)
 
+    def test_help(self, myapp):
+        with pytest.raises(SystemExit):
+            myapp.invoke(_split_cmd_args('group 1234 change --help'))
+
+        chainedgrp = myapp.invoked_subcommand.invoked_subcommand
+        assert chainedgrp.invoked_subcommands, 'Chained subcommand is not marked as called'
+
+        first_chained_cmd = chainedgrp.invoked_subcommands[0]
+        assert first_chained_cmd.parent is chainedgrp
+
     def test_unknown_command(self, myapp):
 
         with pytest.raises(smclip.CommandNotFound) as excinfo:
