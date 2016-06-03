@@ -263,6 +263,11 @@ class TestChainedCommands:
                 ('move', {'moveopt': None, 'where': 'there'}, 'rv-from-move'),
             ]
          ),
+        ('group 1234 relocate here', None,
+         [
+             ('move', {'moveopt': None, 'where': 'here'}, 'rv-from-move'),
+         ]
+         ),
     ])
     def test_chained_combinations(self, myapp, cmdargs, x_cgrp_opt, x_results):
 

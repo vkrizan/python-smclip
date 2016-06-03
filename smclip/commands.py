@@ -314,8 +314,8 @@ class CommandGroup(Command):
 
         if sub_args:
             subcmd_name = sub_args.pop(0)
-            subcmd_cls = self.subcmds_cls.get(subcmd_name) \
-                         or self.subcmd_aliases.get(subcmd_name)
+            subcmd_cls = (self.subcmds_cls.get(subcmd_name)
+                          or self.subcmd_aliases.get(subcmd_name))
 
             if not subcmd_cls:
                 if self._fallback_subcmd_cls:
@@ -427,7 +427,8 @@ class ChainedCommandGroup(CommandGroup):
             while remaining:
 
                 subcmd_name = remaining.pop(0)
-                subcmd_cls = self.subcmds_cls.get(subcmd_name)
+                subcmd_cls = (self.subcmds_cls.get(subcmd_name)
+                              or self.subcmd_aliases.get(subcmd_name))
                 if not subcmd_cls:
                     raise CommandNotFound(subcmd_name, self)
 
