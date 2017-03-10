@@ -79,10 +79,13 @@ class Command(object):
 
     def get_parser_options(self):
         """Returns dictionary of options for parser creation"""
-        opts = {}
-        opts['prog'] = self._generate_usage_prefix()
-        opts['description'] = self.title
-        opts['epilog'] = self.description
+        opts = {
+            'prog': self._generate_usage_prefix(),
+            'description': self.title,
+            'epilog': self.description,
+        }
+        if not issubclass(self.parser_cls, ArgparserSub):
+            opts['formatter_class'] = argparse.RawDescriptionHelpFormatter
         return opts
 
     def _generate_usage_prefix(self):
