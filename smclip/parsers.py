@@ -114,7 +114,7 @@ class GroupHelpFormatter(argparse.RawDescriptionHelpFormatter):
         self._add_item(self._format_subcommand, [subcmd_name, subcmd])
 
     def add_subcommands(self, subcommands):
-        for subcmd_name in subcommands:
+        for subcmd_name in sorted(subcommands, key=str.lower):
             subcmd = subcommands[subcmd_name]
             self.add_subcommand(subcmd_name, subcmd)
 

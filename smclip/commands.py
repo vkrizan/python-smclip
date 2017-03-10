@@ -83,8 +83,9 @@ class Command(object):
             'prog': self._generate_usage_prefix(),
             'description': self.title,
             'epilog': self.description,
-            'formatter_class': argparse.RawDescriptionHelpFormatter
         }
+        if not issubclass(self.parser_cls, ArgparserSub):
+            opts['formatter_class'] = argparse.RawDescriptionHelpFormatter
         return opts
 
     def _generate_usage_prefix(self):
