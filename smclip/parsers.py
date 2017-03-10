@@ -3,6 +3,7 @@
 # License: LGPLv3+
 
 import re
+import inspect
 import argparse
 
 
@@ -56,7 +57,7 @@ class ArgparserSub(argparse.ArgumentParser):
         formatter.end_section()
 
 
-class GroupHelpFormatter(argparse.HelpFormatter):
+class GroupHelpFormatter(argparse.RawDescriptionHelpFormatter):
     """HelpFormatter with support for subcommands"""
 
     def _format_subcommand(self, subcmd_name, subcmd):
@@ -134,12 +135,12 @@ def split_docstring(string):
     if not string:
         return None, None
 
-    parts = re.split(r'(?:\n|\r|\r\n)[ \t]*(?:\n|\r|\r\n)', string, 1)
+    cleaned_docstring = inspect.cleandoc(string)
+    parts = re.split(r'(?:\n|\r|\r\n)[ \t]*(?:\n|\r|\r\n)', cleaned_docstring, 1)
     if len(parts) == 1:
         # header is considered also as description
-        title = str(parts[0]).strip()
+        title = parts[0].strip()
         return title, None
 
-    title = str(parts[0]).strip()
-    description = str(parts[1]).strip()
+    title, description = (p.strip() for p in parts)
     return title, description
