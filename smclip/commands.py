@@ -159,6 +159,9 @@ class Command(object):
         remaining = args.pop(ArgparserSub.REMAINING_ARGS, None)
         return args, remaining
 
+    def commands_to_be_used(self, raw_args):
+        return [self]
+
     def preprocess(self, **args):
         """Callback invoked before action callback
 
@@ -378,6 +381,21 @@ class CommandGroup(Command):
 
     def get_subcmd_real_name(self, subcmd_cls):
         return self._subcmd_names.get(subcmd_cls)
+
+    def commands_to_be_used(self, raw_args):
+        namespace, unknown_args = self.parser.parse_known_args(raw_args)
+        parsed_args, sub_args = self._extract_parsed_args(namespace)
+
+        try:
+            is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
+        except CommandNotFound:
+            is_default = False
+            command = self
+
+        if command and not is_default:
+            return command.commands_to_be_used(sub_args)
+        else:
+            return list(self.subcmds_cls.values())
 
     def results_callback(self, rv):
         """Callback for collecting results from subcommands.
