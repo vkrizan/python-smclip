@@ -182,7 +182,6 @@ class Command(object):
         Args:
             **args: parsed or preprocessed arguments
         """
-
         pass
 
 
@@ -305,15 +304,35 @@ class CommandGroup(Command):
     def invoke(self, raw_args):
         namespace, unknown_args = self.parser.parse_known_args(raw_args)
         parsed_args, sub_args = self._extract_parsed_args(namespace)
+        is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
+
+        if not command:
+            # no subcommand was issues, call current one
+            return self.invoke_callbacks(parsed_args)
+
+        if is_default:
+            return self.invoke_default(raw_args)
+        else:
+            self.preprocess(**dict(parsed_args))
+            rv = command.invoke(sub_args)  # Subcommand invocation
+            self.results_callback(rv)
+            return rv
+
+    def parse_and_get_command(self, raw_args, namespace, unknown_args):
+        """Parse raw arguments and return subcommand object
+
+        Returns:
+            tuple: (is_default, command)
+        """
+        parsed_args, sub_args = self._extract_parsed_args(namespace)
 
         if unknown_args:
             if self._default_subcmd_cls:
-                rv = self.invoke_default(raw_args)
-                return rv
+                return True, self._new_default_subcommand(raw_args)
 
             else:
                 msg = 'unrecognized arguments: %s'
-                self.parser.error(msg % ' '.join(unknown_args))
+                self.parser.error(msg % ' '.join(unknown_args))  # exits
 
         if sub_args:
             subcmd_name = sub_args.pop(0)
@@ -332,34 +351,30 @@ class CommandGroup(Command):
             self.invoked_subcommand = subcmd
             subcmd.parent = self
 
-            self.preprocess(**dict(parsed_args))
+            return False, subcmd
 
-            # Subcommand invoke
-            rv = subcmd.invoke(sub_args)
-            self.results_callback(rv)
+        elif self._default_subcmd_cls:
+            return True, self._new_default_subcommand(raw_args)
 
-        else:
+        return False, None
 
-            if self._default_subcmd_cls:
-                rv = self.invoke_default(raw_args)
-            else:
-                rv = self.invoke_callbacks(parsed_args)
+    def new_subcommand(self, subcmd_cls, real_name, aliased_name=None, **kwargs):
+        kwargs['app'] = self.app
+        return subcmd_cls(real_name, aliased_name, **kwargs)
 
-        return rv
-
-    def invoke_default(self, raw_args):
+    def _new_default_subcommand(self, raw_args):
         subcmd_cls = self._default_subcmd_cls
         real_name = self.get_subcmd_real_name(subcmd_cls)
 
         subcmd = self.new_subcommand(subcmd_cls, real_name)
         subcmd.parent = self
         self.invoked_subcommand = subcmd
+        return subcmd
 
+    def invoke_default(self, raw_args):
+        """Invoke subcommand that was registered as default"""
+        subcmd = self._new_default_subcommand(raw_args)
         return subcmd.invoke(raw_args)
-
-    def new_subcommand(self, subcmd_cls, real_name, aliased_name=None, **kwargs):
-        kwargs['app'] = self.app
-        return subcmd_cls(real_name, aliased_name, **kwargs)
 
     def get_subcmd_real_name(self, subcmd_cls):
         return self._subcmd_names.get(subcmd_cls)
