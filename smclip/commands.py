@@ -155,7 +155,7 @@ class Command(object):
         return rv
 
     def _extract_parsed_args(self, namespace):
-        args = vars(namespace)
+        args = dict(vars(namespace))
         remaining = args.pop(ArgparserSub.REMAINING_ARGS, None)
         return args, remaining
 
