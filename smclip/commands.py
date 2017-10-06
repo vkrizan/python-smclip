@@ -454,31 +454,8 @@ class ChainedCommandGroup(CommandGroup):
         namespace = self.parser.parse_args(raw_args)
         parsed_args, remaining = self._extract_parsed_args(namespace)
 
-        if remaining:
-
-            chained_cmd_args = []
-            self.invoked_subcommand = True
-            self.invoked_subcommands = []
-
-            while remaining:
-
-                subcmd_name = remaining.pop(0)
-                subcmd_cls = (self.subcmds_cls.get(subcmd_name)
-                              or self.subcmd_aliases.get(subcmd_name))
-                if not subcmd_cls:
-                    raise CommandNotFound(subcmd_name, self)
-
-                real_name = self.get_subcmd_real_name(subcmd_cls)
-                subcmd = self.new_subcommand(subcmd_cls, real_name, subcmd_name)
-
-                # set references
-                self.invoked_subcommands.append(subcmd)
-                subcmd.parent = self
-
-                sub_namespace = subcmd.parser.parse_args(remaining)
-                sub_args, remaining = self._extract_parsed_args(sub_namespace)
-                chained_cmd_args.append((subcmd, sub_args))
-
+        chained_cmd_args = self.parse_and_get_chain(remaining)
+        if chained_cmd_args and remaining:
             self.preprocess(**dict(parsed_args))
             results = ChainedOutputResults()
 
@@ -491,11 +468,39 @@ class ChainedCommandGroup(CommandGroup):
             self.results_callback(rv)
 
         else:
-
             # Callback
             rv = self.invoke_callbacks(parsed_args)
 
         return rv
+
+    def parse_and_get_chain(self, remaining):
+        if not remaining:
+            return
+
+        chained_cmd_args = []
+        self.invoked_subcommand = True
+        self.invoked_subcommands = []
+
+        while remaining:
+
+            subcmd_name = remaining.pop(0)
+            subcmd_cls = (self.subcmds_cls.get(subcmd_name)
+                          or self.subcmd_aliases.get(subcmd_name))
+            if not subcmd_cls:
+                raise CommandNotFound(subcmd_name, self)
+
+            real_name = self.get_subcmd_real_name(subcmd_cls)
+            subcmd = self.new_subcommand(subcmd_cls, real_name, subcmd_name)
+
+            # set references
+            subcmd.parent = self
+            self.invoked_subcommands.append(subcmd)
+
+            sub_namespace = subcmd.parser.parse_args(remaining)
+            sub_args, remaining = self._extract_parsed_args(sub_namespace)
+            chained_cmd_args.append((subcmd, sub_args))
+
+        return chained_cmd_args
 
 
 class ChainedOutputResults(object):
