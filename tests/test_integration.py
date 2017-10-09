@@ -254,6 +254,11 @@ class TestChainedCommands:
                 ('change', {'changeopt': 'carg'}, 'rv-from-change'),
             ]
          ),
+        ('group 1234 change', None,
+         [
+             ('change', {'changeopt': None}, 'rv-from-change'),
+         ]
+         ),
         ('group 1234 move here move there', None,
             [
                 ('move', {'moveopt': None, 'where': 'here'}, 'rv-from-move'),

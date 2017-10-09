@@ -479,7 +479,7 @@ class ChainedCommandGroup(CommandGroup):
         except CommandError as e:
             e.parser.error(str(e))
 
-        if chained_cmd_args and remaining:
+        if chained_cmd_args:
             self.preprocess(**dict(parsed_args))
             results = ChainedOutputResults()
 
