@@ -4,7 +4,7 @@
 
 import argparse
 
-from .exceptions import CommandNotFound
+from .exceptions import *
 from .parsers import ArgparserSub, split_docstring
 
 __all__ = ['Command', 'CommandGroup', 'ChainedCommand', 'ChainedCommandGroup',
@@ -307,7 +307,11 @@ class CommandGroup(Command):
     def invoke(self, raw_args):
         namespace, unknown_args = self.parser.parse_known_args(raw_args)
         parsed_args, sub_args = self._extract_parsed_args(namespace)
-        is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
+
+        try:
+            is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
+        except CommandError as e:
+            e.parser.error(str(e))
 
         if not command:
             # no subcommand was issues, call current one
@@ -334,8 +338,10 @@ class CommandGroup(Command):
                 return True, self._new_default_subcommand(raw_args)
 
             else:
-                msg = 'unrecognized arguments: %s'
-                self.parser.error(msg % ' '.join(unknown_args))  # exits
+                raise CommandUnrecognizedArgs(self.default_name,
+                                              parent=self.parent,
+                                              parser=self.parser,
+                                              unknown_args=unknown_args)
 
         if sub_args:
             subcmd_name = sub_args.pop(0)
@@ -346,7 +352,9 @@ class CommandGroup(Command):
                 if self._fallback_subcmd_cls:
                     subcmd_cls = self._fallback_subcmd_cls
                 else:
-                    raise CommandNotFound(subcmd_name, self)
+                    raise CommandNotFound(subcmd_name,
+                                          parent=self,
+                                          parser=self.parser)
 
             real_name = self.get_subcmd_real_name(subcmd_cls)
             subcmd = self.new_subcommand(subcmd_cls, real_name, subcmd_name)
@@ -388,7 +396,7 @@ class CommandGroup(Command):
 
         try:
             is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
-        except CommandNotFound:
+        except CommandError:
             is_default = False
             command = self
 
@@ -460,7 +468,11 @@ class ChainedCommandGroup(CommandGroup):
         namespace = self.parser.parse_args(raw_args)
         parsed_args, remaining = self._extract_parsed_args(namespace)
 
-        chained_cmd_args = self.parse_and_get_chain(remaining)
+        try:
+            chained_cmd_args = self.parse_and_get_chain(remaining)
+        except CommandError as e:
+            e.parser.error(str(e))
+
         if chained_cmd_args and remaining:
             self.preprocess(**dict(parsed_args))
             results = ChainedOutputResults()
@@ -493,7 +505,9 @@ class ChainedCommandGroup(CommandGroup):
             subcmd_cls = (self.subcmds_cls.get(subcmd_name)
                           or self.subcmd_aliases.get(subcmd_name))
             if not subcmd_cls:
-                raise CommandNotFound(subcmd_name, self)
+                raise CommandNotFound(subcmd_name,
+                                      parent=self,
+                                      parser=self.parser)
 
             real_name = self.get_subcmd_real_name(subcmd_cls)
             subcmd = self.new_subcommand(subcmd_cls, real_name, subcmd_name)
@@ -502,7 +516,13 @@ class ChainedCommandGroup(CommandGroup):
             subcmd.parent = self
             self.invoked_subcommands.append(subcmd)
 
-            sub_namespace = subcmd.parser.parse_args(remaining)
+            sub_namespace, unknown_args = subcmd.parser.parse_known_args(remaining)
+            if unknown_args:
+                raise CommandUnrecognizedArgs(subcmd_name,
+                                              parent=self.parent,
+                                              parser=subcmd.parser,
+                                              unknown_args=unknown_args)
+
             sub_args, remaining = self._extract_parsed_args(sub_namespace)
             chained_cmd_args.append((subcmd, sub_args))
 

@@ -43,11 +43,8 @@ class TestApplication:
 
     def test_unknown_command(self, myapp):
 
-        with pytest.raises(smclip.CommandNotFound) as excinfo:
+        with pytest.raises(SystemExit) as excinfo:
             myapp.invoke(_split_cmd_args('unknowncmd'))
-
-        assert excinfo.value.command_name == 'unknowncmd'
-        assert 'unknowncmd' in str(excinfo.value)
 
 
 class TestSimpleCommand:
@@ -309,7 +306,5 @@ class TestChainedCommands:
 
     def test_unknown_command(self, myapp):
 
-        with pytest.raises(smclip.CommandNotFound) as excinfo:
+        with pytest.raises(SystemExit) as excinfo:
             myapp.invoke(_split_cmd_args('empty unknowncmd'))
-
-        assert excinfo.value.command_name == 'unknowncmd'
