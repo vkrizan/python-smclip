@@ -70,9 +70,10 @@ class Command(object):
             self._parser = self.create_parser()
         return self._parser
 
-    def create_parser(self):
+    def create_parser(self, **custom_opts):
         """Creates parser and adds all defined arguments"""
         parser_opts = self.get_parser_options()
+        parser_opts.update(custom_opts)
         parser = self.parser_cls(**parser_opts)
         self.add_arguments(parser)
         return parser
@@ -299,8 +300,8 @@ class CommandGroup(Command):
         opts['subcommands'] = self.subcmds_cls
         return opts
 
-    def create_parser(self):
-        parser = super(CommandGroup, self).create_parser()
+    def create_parser(self, **custom_opts):
+        parser = super(CommandGroup, self).create_parser(**custom_opts)
         parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
@@ -418,8 +419,8 @@ class CommandGroup(Command):
 
 class ChainedCommand(Command):
 
-    def create_parser(self):
-        parser = super(ChainedCommand, self).create_parser()
+    def create_parser(self, **custom_opts):
+        parser = super(ChainedCommand, self).create_parser(**custom_opts)
         parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
