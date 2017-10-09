@@ -396,12 +396,7 @@ class CommandGroup(Command):
         namespace, unknown_args = self.parser.parse_known_args(raw_args)
         parsed_args, sub_args = self._extract_parsed_args(namespace)
 
-        try:
-            is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
-        except CommandError:
-            is_default = False
-            command = self
-
+        is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
         if command and not is_default:
             return command.commands_to_be_used(sub_args)
         else:
