@@ -415,6 +415,12 @@ class ChainedCommand(Command):
         parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
+    def commands_to_be_used(self, raw_args):
+        if self.parent:
+            return list(self.parent.subcmds_cls.values())
+        else:
+            return [self]
+
 
 class ChainedCommandGroup(CommandGroup):
     """Command that supports chained sub commands
