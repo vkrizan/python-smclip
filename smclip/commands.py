@@ -392,6 +392,7 @@ class CommandGroup(Command):
         return self._subcmd_names.get(subcmd_cls)
 
     def commands_to_be_used(self, raw_args):
+        self._parser = self.create_parser(add_help=False)
         namespace, unknown_args = self.parser.parse_known_args(raw_args)
         parsed_args, sub_args = self._extract_parsed_args(namespace)
 
