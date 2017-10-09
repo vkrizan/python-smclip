@@ -402,6 +402,15 @@ class CommandGroup(Command):
         else:
             return list(self.subcmds_cls.values())
 
+    def possible_command_names(self, raw_args):
+        # TODO support real names
+        try:
+            commands = self.commands_to_be_used(raw_args)
+        except CommandError:
+            return
+
+        return [cmd.default_name for cmd in commands]
+
     def results_callback(self, rv):
         """Callback for collecting results from subcommands.
 
