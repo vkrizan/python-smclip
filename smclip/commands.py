@@ -406,8 +406,13 @@ class CommandGroup(Command):
         # TODO support real names
         try:
             commands = self.commands_to_be_used(raw_args)
-        except CommandError:
+        except CommandError as e:
             return
+        except SystemExit as e:
+            # handle bad arguments
+            if e.code == 2:
+                return
+            raise
 
         return [cmd.default_name for cmd in commands]
 
