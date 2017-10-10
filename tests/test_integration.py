@@ -1,19 +1,9 @@
 
 import pytest
+import smclip
 
 from integration_classes import *
-
-
-def _split_cmd_args(cmdargs):
-    if not cmdargs:
-        return []
-    else:
-        return cmdargs.split(' ')
-
-
-@pytest.fixture(scope='function')
-def myapp():
-    return MyApplication()
+from integration_classes import _split_cmd_args
 
 
 # ==========================================================
