@@ -49,7 +49,7 @@ class Command(object):
     default_aliases = None
 
     def __init__(self, name=None, alias=None, parser_cls=None, app=None):
-        self.name = name
+        self.name = name or self.default_name
         self.alias = alias
         self._parser = None
         self.parent = None
@@ -401,11 +401,11 @@ class CommandGroup(Command):
             return command.commands_to_be_used(sub_args)
         else:
             commands = [self]
-            commands.extend(self.subcmds_cls.values())
+            subcommand_cls = self.subcmds_cls.values()
+            commands.extend(cls() for cls in subcommand_cls)
             return commands
 
     def possible_command_names(self, raw_args):
-        # TODO support real names
         try:
             commands = self.commands_to_be_used(raw_args)
         except CommandError as e:
@@ -416,7 +416,7 @@ class CommandGroup(Command):
                 return
             raise
 
-        command_names = [cmd.default_name for cmd in commands]
+        command_names = [cmd.name for cmd in commands]
         if not command_names:
             return []
 
@@ -445,7 +445,8 @@ class ChainedCommand(Command):
     def commands_to_be_used(self, raw_args):
         if self.parent:
             commands = [self]
-            commands.extend(self.parent.subcmds_cls.values())
+            chained_cls = self.parent.subcmds_cls.values()
+            commands.extend(cls() for cls in chained_cls)
             return commands
         else:
             return [self]
