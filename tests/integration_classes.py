@@ -95,7 +95,7 @@ class ItemGroupCommand(smclip.CommandGroup):
 
         self.register(ListCommand)
         self.register(CreateCommand)
-        self.register(ViewEditCommand, is_fallback=True)
+        self.register(ViewEditCommand)
 
         # Mock methods
         self.preprocess = mock.Mock(return_value=None)

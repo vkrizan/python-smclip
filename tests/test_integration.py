@@ -213,10 +213,10 @@ class TestChainedCommands:
         assert groupcmd.this_action.call_count == 0
 
     @pytest.mark.parametrize('cmdargs,x_cmd_alias,x_cgrp_opt', [
-        ('group ID', 'ID', None),
-        ('group 1234', '1234', None),
-        ('group 1234 --vieweditopt value', '1234', 'value'),
-        ('group anything', 'anything', None),
+        ('listdefault ID', 'ID', None),
+        ('listdefault 1234', '1234', None),
+        ('listdefault 1234 --vieweditopt value', '1234', 'value'),
+        ('listdefault anything', 'anything', None),
     ])
     def test_direct_call(self, myapp, cmdargs, x_cmd_alias, x_cgrp_opt):
 
@@ -233,29 +233,29 @@ class TestChainedCommands:
         assert chainedgrp.results_callback.call_count == 0
 
     @pytest.mark.parametrize('cmdargs,x_cgrp_opt,x_results', [
-        ('group 1234 change move here', None,
+        ('listdefault 1234 change move here', None,
             [
                 ('change', {'changeopt': None}, 'rv-from-change'),
                 ('move', {'moveopt': None, 'where': 'here'}, 'rv-from-move'),
             ]
          ),
-        ('group 1234 change --changeopt carg', None,
+        ('listdefault 1234 change --changeopt carg', None,
             [
                 ('change', {'changeopt': 'carg'}, 'rv-from-change'),
             ]
          ),
-        ('group 1234 change', None,
+        ('listdefault 1234 change', None,
          [
              ('change', {'changeopt': None}, 'rv-from-change'),
          ]
          ),
-        ('group 1234 move here move there', None,
+        ('listdefault 1234 move here move there', None,
             [
                 ('move', {'moveopt': None, 'where': 'here'}, 'rv-from-move'),
                 ('move', {'moveopt': None, 'where': 'there'}, 'rv-from-move'),
             ]
          ),
-        ('group 1234 relocate here', None,
+        ('listdefault 1234 relocate here', None,
          [
              ('move', {'moveopt': None, 'where': 'here'}, 'rv-from-move'),
          ]
@@ -291,7 +291,7 @@ class TestChainedCommands:
 
     def test_help(self, myapp):
         with pytest.raises(SystemExit):
-            myapp.invoke(_split_cmd_args('group 1234 change --help'))
+            myapp.invoke(_split_cmd_args('listdefault 1234 change --help'))
 
         chainedgrp = myapp.invoked_subcommand.invoked_subcommand
         assert chainedgrp.invoked_subcommands, 'Chained subcommand is not marked as called'
