@@ -400,7 +400,9 @@ class CommandGroup(Command):
         if command and not is_default:
             return command.commands_to_be_used(sub_args)
         else:
-            return list(self.subcmds_cls.values())
+            commands = [self]
+            commands.extend(self.subcmds_cls.values())
+            return commands
 
     def possible_command_names(self, raw_args):
         # TODO support real names
@@ -414,7 +416,13 @@ class CommandGroup(Command):
                 return
             raise
 
-        return [cmd.default_name for cmd in commands]
+        command_names = [cmd.default_name for cmd in commands]
+        if not command_names:
+            return []
+
+        command_names.pop(0)  # remove command that is currently in effect
+        command_names.sort()
+        return command_names
 
     def results_callback(self, rv):
         """Callback for collecting results from subcommands.
@@ -436,7 +444,9 @@ class ChainedCommand(Command):
 
     def commands_to_be_used(self, raw_args):
         if self.parent:
-            return list(self.parent.subcmds_cls.values())
+            commands = [self]
+            commands.extend(self.parent.subcmds_cls.values())
+            return commands
         else:
             return [self]
 
