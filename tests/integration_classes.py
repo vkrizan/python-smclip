@@ -7,6 +7,13 @@ except ImportError:
     import mock
 
 
+def _split_cmd_args(cmdargs):
+    if not cmdargs:
+        return []
+    else:
+        return cmdargs.split(' ')
+
+
 class MyApplication(smclip.CommandGroup):
 
     def __init__(self):
@@ -76,6 +83,7 @@ class PreprocessingCommand(smclip.Command):
     def add_arguments(self, parser):
         parser.add_argument('--toreplace')
 
+
 class ItemGroupCommand(smclip.CommandGroup):
     """Print help"""
 
@@ -87,7 +95,7 @@ class ItemGroupCommand(smclip.CommandGroup):
 
         self.register(ListCommand)
         self.register(CreateCommand)
-        self.register(ViewEditCommand, is_fallback=True)
+        self.register(ViewEditCommand)
 
         # Mock methods
         self.preprocess = mock.Mock(return_value=None)
