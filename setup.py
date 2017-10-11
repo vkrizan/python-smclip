@@ -13,6 +13,7 @@ def get_version():
             if line.startswith('__version__ = '):
                 return eval(line.split('=')[-1])
 
+
 with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 

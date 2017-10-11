@@ -7,8 +7,8 @@
 %endif
 
 Name:           python-%{pyname}
-Version:        0.2.2
-Release:        2%{?dist}
+Version:        0.3.0
+Release:        1%{?dist}
 Summary:        %{summary}
 
 Group:          Development/Libraries
@@ -91,6 +91,10 @@ multi command line arguments.
 %endif
 
 %changelog
+* Wed Oct 11 2017 Viliam Krizan <vkrizan AT redhat.com> 0.3.0-1
+- improved doc string parsing for help
+- possible subcommands for defined arguments for bash completion
+
 * Mon Mar 06 2017 Viliam Krizan <vkrizan AT redhat.com> 0.2.2-2
 - Support build for EL7
 
