@@ -160,7 +160,7 @@ class Command(object):
         remaining = args.pop(ArgparserSub.REMAINING_ARGS, None)
         return args, remaining
 
-    def commands_to_be_used(self, raw_args):
+    def commands_for_args(self, raw_args):
         """Return current command and possible subcommands for the set of arguments
 
         Returns:
@@ -396,14 +396,14 @@ class CommandGroup(Command):
     def get_subcmd_real_name(self, subcmd_cls):
         return self._subcmd_names.get(subcmd_cls)
 
-    def commands_to_be_used(self, raw_args):
+    def commands_for_args(self, raw_args):
         self._parser = self.create_parser(add_help=False)
         namespace, unknown_args = self.parser.parse_known_args(raw_args)
         parsed_args, sub_args = self._extract_parsed_args(namespace)
 
         is_default, command = self.parse_and_get_command(raw_args, namespace, unknown_args)
         if command and not is_default:
-            return command.commands_to_be_used(sub_args)
+            return command.commands_for_args(sub_args)
         else:
             commands = [self]
             subcommand_cls = self.subcmds_cls.values()
@@ -418,7 +418,7 @@ class CommandGroup(Command):
             None on failure in case of bad arguments.
         """
         try:
-            commands = self.commands_to_be_used(raw_args)
+            commands = self.commands_for_args(raw_args)
         except CommandError:
             return
         except SystemExit as e:
@@ -453,7 +453,7 @@ class ChainedCommand(Command):
         parser.add_argument(ArgparserSub.REMAINING_ARGS, nargs=argparse.REMAINDER)
         return parser
 
-    def commands_to_be_used(self, raw_args):
+    def commands_for_args(self, raw_args):
         if self.parent:
             commands = [self]
             chained_cls = self.parent.subcmds_cls.values()

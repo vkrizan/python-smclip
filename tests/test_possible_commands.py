@@ -33,7 +33,7 @@ def test_possible_commands(myapp, cmdargs, current_command_name, subcommand_name
     assert cmd_names is not None
     assert set(cmd_names) == set(subcommand_names)
 
-    possible_commands = myapp.commands_to_be_used(args)
+    possible_commands = myapp.commands_for_args(args)
     assert len(possible_commands) > 0
     assert possible_commands[0].default_name == current_command_name, \
         'Current command was not included'
