@@ -24,7 +24,7 @@ setup(
     long_description=long_description,
     url='https://github.com/vkrizan/python-smclip',
     author='Viliam Krizan',
-    author_email='vkrizan (AT) redhat.com',
+    author_email='vkrizan@redhat.com',
     license='LGPLv3+',
     keywords='cli, argument parser, multi commands',
     classifiers=[
