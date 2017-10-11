@@ -161,6 +161,11 @@ class Command(object):
         return args, remaining
 
     def commands_to_be_used(self, raw_args):
+        """Return current command and possible subcommands for the set of arguments
+
+        Returns:
+            (list) of Command objects
+        """
         return [self]
 
     def preprocess(self, **args):
@@ -406,9 +411,15 @@ class CommandGroup(Command):
             return commands
 
     def possible_command_names(self, raw_args):
+        """Return possible subcommand names for a set of arguments
+
+        Returns:
+            (list) of strings of command names,
+            None on failure in case of bad arguments.
+        """
         try:
             commands = self.commands_to_be_used(raw_args)
-        except CommandError as e:
+        except CommandError:
             return
         except SystemExit as e:
             # handle bad arguments
