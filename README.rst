@@ -8,7 +8,7 @@ Simple Multi Command Line Parser
     :target: https://codecov.io/github/vkrizan/python-smclip?branch=master
 
 SMCLIP is a simple framework for parsing multi command line arguments using
-python's builtin ArgumentParser.  With SMCLIP you are able to built git-like
+python's builtin argparse library.  With SMCLIP you are able to built git-like
 commands.  Commands are created by inheriting from base Command classes and
 extending their callbacks.
 
@@ -27,12 +27,12 @@ Differences with ...
 
 Why you should choose SMCLIP when [X] supports sub-commands?
 
-ArgumentParser
-^^^^^^^^^^^^^^
+Argparse
+^^^^^^^^
 
 https://docs.python.org/3/library/argparse.html#sub-commands
 
-Python's ArgumentParser support sub-commands by adding sub-parsers to
+Python's argparse support sub-commands by adding sub-parsers to
 the parent parser.  The ArgumentParser with sub-commands considers
 that a CLI application is simple and does simple operations.
 A CLI application starts can get confusing to users (in help) when
