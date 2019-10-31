@@ -2,7 +2,13 @@
 %global summary Simple Multi Command Line Parser
 %if 0%{?fedora}
 %global with_python3 1
+%if 0%{?fedora} < 31
+%global with_python2 1
 %else
+%global with_python2 0
+%endif
+%else
+%global with_python2 1
 %global with_python3 0
 %endif
 
@@ -18,6 +24,7 @@ Source0:        https://files.pythonhosted.org/packages/source/s/%{pyname}/%{pyn
 
 BuildArch:      noarch
 
+%if 0%{?with_python2}
 %if 0%{?fedora}
 BuildRequires:  python2-devel
 %else
@@ -28,6 +35,7 @@ BuildRequires:  python2-rpm-macros
 
 BuildRequires:  pytest
 BuildRequires:  python2-mock
+%endif
 %if 0%{?with_python3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
@@ -37,6 +45,7 @@ BuildRequires:  python3-pytest
 An python module which provides a simple framework for parsing
 multi command line arguments.
 
+%if 0%{?with_python2}
 %package -n python2-%{pyname}
 Summary:        %{summary}
 %{?python_provide:%python_provide python2-%{pyname}}
@@ -44,6 +53,7 @@ Summary:        %{summary}
 %description -n python2-%{pyname}
 An python module which provides a simple framework for parsing
 multi command line arguments.
+%endif
 
 %if 0%{?with_python3}
 %package -n python3-%{pyname}
@@ -59,29 +69,37 @@ multi command line arguments.
 %autosetup -n %{pyname}-%{version}
 
 %build
+%if 0%{?with_python2}
 %py2_build
+%endif
 %if 0%{?with_python3}
 %py3_build
 %endif
 
 
 %install
+%if 0%{?with_python2}
 %py2_install
+%endif
 %if 0%{?with_python3}
 %py3_install
 %endif
 
 %check
+%if 0%{?with_python2}
 %{__python2} -m pytest
+%endif
 %if 0%{?with_python3}
 %{__python3} -m pytest
 %endif
 
 # Note that there is no %%files section for the unversioned python module if we are building for several python runtimes
+%if 0%{?with_python2}
 %files -n python2-%{pyname}
 %license LICENSE
 %doc README.rst
 %{python2_sitelib}/*
+%endif
 
 %if 0%{?with_python3}
 %files -n python3-%{pyname}
